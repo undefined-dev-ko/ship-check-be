@@ -52,7 +52,7 @@ jobs:
           aws-region: ap-northeast-2
     
       - name: download artifact
-        uses: action/download-artifact@v4
+        uses: actions/download-artifact@v4
         with:
           name: ship-check-be
 
