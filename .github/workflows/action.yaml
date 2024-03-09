@@ -40,17 +40,23 @@ jobs:
         with:
           name: ship-check-be
           path: dist.zip
+          retention-days: 1
   
   upload:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: configure aws credentials
-        uses: aws-actions/configure/aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
     
+      - name: download artifact
+        uses: action/download-artifact@v4
+        with:
+          name: ship-check-be
 
-        
+      - name: upload to s3
+        run: aws s3 put-object --bucket dev-hobby --key dist.zip --body ./dist.zip
