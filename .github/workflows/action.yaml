@@ -28,7 +28,7 @@ jobs:
         run: npm install
 
       - name: build
-        run: npm build
+        run: npm run build
 
       - name: zip 
         uses: montudor/action-zip@v1
