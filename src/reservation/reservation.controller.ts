@@ -29,7 +29,7 @@ export class ReservationController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  createBoard(
+  createReservation(
     @Body() createReservationDto: CreateReservationDto,
     @GetUser() user: User
   ): Promise<Reservation> {

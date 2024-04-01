@@ -6,6 +6,7 @@ import {
   OneToOne,
   OneToMany,
   ManyToOne,
+  CreateDateColumn,
 } from "typeorm";
 
 @Entity()
@@ -21,6 +22,7 @@ export class Reservation {
   seatId: number;
 
   @Column()
+  @CreateDateColumn()
   createdAt: Date;
 }
 
@@ -40,7 +42,9 @@ export class Seat {
   @Column()
   items: Item[];
 
-  @OneToOne((type) => Reservation)
+  // itemIds: number[]; mapping table 로 고려
+
+  // @OneToOne((type) => Reservation) one to many 로 수정
   reservation?: Reservation;
 }
 
