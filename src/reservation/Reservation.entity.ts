@@ -7,16 +7,20 @@ import {
   OneToMany,
   ManyToOne,
   CreateDateColumn,
+  BaseEntity,
+  JoinColumn,
 } from "typeorm";
 
 @Entity()
-export class Reservation {
+export class Reservation extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne((type) => User)
-  @Column()
+  @ManyToOne((type) => User)
   user: User;
+
+  @JoinColumn()
+  userId: number;
 
   @Column()
   seatId: number;
@@ -34,13 +38,13 @@ export class Seat {
   @Column()
   deskNo: number;
 
-  @OneToOne((type) => User)
-  @Column()
-  fixedUser?: User;
+  // @OneToOne((type) => User)
+  // @Column()
+  // fixedUser?: User;
 
-  @OneToMany((type) => Item, (item) => item.seat)
-  @Column()
-  items: Item[];
+  // @OneToMany((type) => Item, (item) => item.seat)
+  // @Column()
+  // items: Item[];
 
   // itemIds: number[]; mapping table 로 고려
 
@@ -59,7 +63,7 @@ export class Item {
   @Column()
   memo?: string;
 
-  @ManyToOne(() => Seat, (seat) => seat.items)
-  @Column()
-  seat?: Seat;
+  // @ManyToOne(() => Seat, (seat) => seat.items)
+  // @Column()
+  // seat?: Seat;
 }
