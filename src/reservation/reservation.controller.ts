@@ -29,17 +29,16 @@ export class ReservationController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  createReservation(
+  async createReservation(
     @Body() createReservationDto: CreateReservationDto,
     @GetUser() user: User
   ): Promise<Reservation> {
     this.logger.verbose(`User ${user.name} creating a new reservation.
       Payload: ${JSON.stringify(createReservationDto)} `);
-    // return this.reservationService.createReservation(
-    //   createReservationDto,
-    //   user
-    // );
 
-    return;
+    return this.reservationService.createReservation(
+      createReservationDto,
+      user
+    );
   }
 }
