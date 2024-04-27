@@ -1,10 +1,8 @@
-import { User } from "src/auth/user.entity";
+import { User } from "src/user/user.entity";
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
-  OneToMany,
   ManyToOne,
   CreateDateColumn,
   BaseEntity,
@@ -38,17 +36,6 @@ export class Seat {
   @Column()
   deskNo: number;
 
-  // @OneToOne((type) => User)
-  // @Column()
-  // fixedUser?: User;
-
-  // @OneToMany((type) => Item, (item) => item.seat)
-  // @Column()
-  // items: Item[];
-
-  // itemIds: number[]; mapping table 로 고려
-
-  // @OneToOne((type) => Reservation) one to many 로 수정
   reservation?: Reservation;
 }
 
@@ -62,8 +49,4 @@ export class Item {
 
   @Column()
   memo?: string;
-
-  // @ManyToOne(() => Seat, (seat) => seat.items)
-  // @Column()
-  // seat?: Seat;
 }
