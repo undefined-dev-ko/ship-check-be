@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationPipe } from "@nestjs/common";
 import express from "express";
 import helmet from "helmet";
+require("source-map-support").install();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

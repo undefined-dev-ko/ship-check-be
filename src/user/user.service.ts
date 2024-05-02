@@ -14,11 +14,14 @@ export class UserService {
 
   async getOneUserByEmail(email: string): Promise<User> {
     return await this.dataSource.manager.findOne(User, {
+      relations: ["team"],
       where: { email },
     });
   }
 
-  async createUser(userPayload: Pick<User, "email" | "team">): Promise<User> {
+  async createUser(
+    userPayload: Pick<User, "email" | "name" | "photo">
+  ): Promise<User> {
     const user = this.dataSource.manager.create<User, Partial<User>>(User, {
       ...userPayload,
     });

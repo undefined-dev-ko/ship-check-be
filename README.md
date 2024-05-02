@@ -1,6 +1,5 @@
 [![ship-check-be-action](https://github.com/undefined-dev-ko/ship-check-be/actions/workflows/action.yaml/badge.svg)](https://github.com/undefined-dev-ko/ship-check-be/actions/workflows/action.yaml)
 
-
 ## Swagger
 
 ```bash
@@ -46,3 +45,9 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+
+https://docs.aws.amazon.com/codedeploy/latest/userguide/tutorials-github.html
+
+https://stackoverflow.com/questions/62087265/deploy-code-directly-to-aws-ec2-instance-using-github-actions
+
+https://ji5485.github.io/post/2021-06-26/create-env-with-github-actions-secrets/

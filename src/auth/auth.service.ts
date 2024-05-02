@@ -55,15 +55,12 @@ export class AuthService {
       (await this.userService.getOneUserByEmail(googlePayload.email)) ||
       (await this.userService.createUser({
         email: googlePayload.email,
-        team: "etc",
+        name: googlePayload.name || googlePayload.email,
+        photo: googlePayload.picture || "",
       }));
 
     return this.authUtil.createToken({
-      id: user.id,
-      email: googlePayload.email,
-      name: googlePayload.name,
-      photo: googlePayload.picture,
-      team: user.team,
+      ...user,
     });
   }
 

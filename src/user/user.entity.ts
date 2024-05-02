@@ -18,14 +18,18 @@ export class User {
   @Column()
   email: string;
 
-  @ManyToOne(() => Team, { eager: true })
-  @JoinColumn({ name: "teamName" })
-  @ApiProperty({ description: "team 이름" })
-  team: string;
-
   @Column()
   name: string;
 
   @Column()
   photo: string;
+
+  @ApiProperty({ description: "Team 정보" })
+  @ManyToOne(() => Team, (team) => team.users)
+  @JoinColumn([{ name: "teamId", referencedColumnName: "id" }])
+  team?: Team;
+
+  // #TODO 팀은 사후에 등록하도록 하기 위해서 nullable로
+  @Column({ nullable: true })
+  teamId?: number;
 }

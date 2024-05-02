@@ -1,28 +1,12 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
-import { AuthService } from "./auth.service";
-import { AuthUtil } from "../common/authUtil";
-import { CreateAccessTokenByGoogleRequest, TokenPair } from "./dto";
+import { Body, Controller, Post } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { AuthService } from "./auth.service";
+import { CreateAccessTokenByGoogleRequest, TokenPair } from "./dto";
 
 @ApiTags("auth")
 @Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
-  @Post("login/test")
-  @ApiOperation({
-    summary: "테스트 JWT 토큰 생성",
-    description: "테스트용 JWT 토큰을 생성한다 개발 끝나면 없애줘요",
-  })
-  async createAccessTokenTest(): Promise<TokenPair> {
-    return new AuthUtil().createToken({
-      id: 9999,
-      email: "test@ship-da.com",
-      name: "tester",
-      photo: "abc",
-      team: "etc",
-    });
-  }
 
   @Post("login/google")
   @ApiOperation({

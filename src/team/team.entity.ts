@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { User } from "src/user/user.entity";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -7,6 +8,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  OneToMany,
 } from "typeorm";
 
 @Entity("team")
@@ -19,6 +21,9 @@ export class Team {
   @Column()
   @ApiProperty({ description: "회사에서 사용하는 팀 이름" })
   name: string;
+
+  @OneToMany(() => User, (user) => user.team)
+  users: User[];
 
   @CreateDateColumn()
   createdAt: Date;

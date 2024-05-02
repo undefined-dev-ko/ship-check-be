@@ -1,11 +1,12 @@
 import { randomUUID, createHash } from "crypto";
 import * as jwt from "jsonwebtoken";
+import { Team } from "src/team/team.entity";
 
 export type JwtPayload = {
   id: number;
   name: string;
   email: string;
-  team: string;
+  team?: Team;
   photo?: string;
   refSig?: string;
 };
