@@ -1,8 +1,8 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { OAuth2Client } from "google-auth-library";
 import { AuthUtil } from "../common/authUtil";
-import { ConfigService } from "src/config/config.service";
-import { UserService } from "src/user/user.service";
+import { ConfigService } from "../config/config.service";
+import { UserService } from "../user/user.service";
 
 const SHIPDA_EMAIL_SIGNATURE = "@ship-da.com";
 @Injectable()

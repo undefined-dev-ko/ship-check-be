@@ -7,6 +7,7 @@ import {
   GetReservationListResponse,
 } from "./dto";
 import { DataSource } from "typeorm";
+import { Seat } from "../seat/seat.entity";
 
 @Injectable()
 export class ReservationService {
@@ -17,6 +18,7 @@ export class ReservationService {
 
   async getReservationList(reservedAt): Promise<GetReservationListResponse> {
     const reservationList = await this.dataSource.manager.find(Reservation, {
+      relations: ["seat", "user"],
       where: { reservedAt },
     });
 
@@ -24,13 +26,22 @@ export class ReservationService {
   }
 
   async createReservation(
-    payload: CreateReservationRequest
+    payload: CreateReservationRequest,
+    userId: number
   ): Promise<Reservation> {
+    const seat = await this.dataSource.manager.findOne(Seat, {
+      where: { id: payload.seatId },
+    });
+    if (!seat) {
+      throw new NotFoundException("좌석이 존재하지않습니다.");
+    }
+
     const reservation = this.dataSource.manager.create<
       Reservation,
       Partial<Reservation>
     >(Reservation, {
       ...payload,
+      userId,
     });
 
     return await this.dataSource.manager.save(reservation);
@@ -38,7 +49,7 @@ export class ReservationService {
 
   async cancelReservation(payload: CancelReservationRequest): Promise<void> {
     const reservation = this.dataSource.manager.findOne(Reservation, {
-      where: { ...payload },
+      where: { seatId: payload.seatId, reservedAt: payload.reservedAt },
     });
 
     if (!reservation) {
@@ -46,7 +57,8 @@ export class ReservationService {
     }
 
     await this.dataSource.manager.softDelete(Reservation, {
-      ...payload,
+      seatId: payload.seatId,
+      reservedAt: payload.reservedAt,
     });
   }
 }

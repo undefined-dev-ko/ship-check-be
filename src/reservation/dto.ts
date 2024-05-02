@@ -1,18 +1,15 @@
-import { IsDateString, IsNotEmpty } from "class-validator";
+import { IsDateString, IsNotEmpty, IsNumber } from "class-validator";
 import { Reservation } from "./reservation.entity";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateReservationRequest {
-  // TODO: 토큰으로 어떤 유저인지 알 수 있는지?
-  @IsNotEmpty()
-  userId: number;
-
-  @IsNotEmpty()
+  @IsNumber()
+  @ApiProperty({ description: "자리 번호" })
   seatId: number;
 
   @IsNotEmpty()
   @IsDateString()
-  reservedAt: Date;
+  reservedAt: string;
 }
 
 export class CreateReservationResponse extends Reservation {}
@@ -23,13 +20,10 @@ export class GetReservationListResponse {
 }
 
 export class CancelReservationRequest {
-  @IsNotEmpty()
-  userId: number;
-
-  @IsNotEmpty()
+  @IsNumber()
   seatId: number;
 
   @IsNotEmpty()
   @IsDateString()
-  reservedAt: Date;
+  reservedAt: string;
 }

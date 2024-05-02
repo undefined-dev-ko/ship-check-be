@@ -1,15 +1,17 @@
-import { randomUUID, createHash } from "crypto";
+import { createParamDecorator, ExecutionContext } from "@nestjs/common";
+import { createHash, randomUUID } from "crypto";
 import * as jwt from "jsonwebtoken";
-import { Team } from "src/team/team.entity";
+import { Team } from "../team/team.entity";
+import { User as UserEntity } from "../user/user.entity";
 
-export type JwtPayload = {
+export interface JwtPayload extends Partial<UserEntity> {
   id: number;
   name: string;
   email: string;
   team?: Team;
   photo?: string;
   refSig?: string;
-};
+}
 
 export class AuthUtil {
   private static secret: string = process.env.SECRET || randomUUID();
@@ -62,3 +64,10 @@ export class AuthUtil {
     return verified;
   }
 }
+
+export const AuthPayload = createParamDecorator(
+  (data: unknown, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest();
+    return request.user as JwtPayload;
+  }
+);
