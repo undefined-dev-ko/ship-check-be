@@ -6,19 +6,9 @@ import { DatabaseModule } from "./database/database.module";
 import { ConfigModule } from "./config/config.module";
 import { UserModule } from "./user/user.module";
 import { TeamModule } from "./team/team.module";
-import { ReservationModule } from "./reservation/reservation.module";
-import { SeatModule } from "./seat/seat.module";
 
 @Module({
-  imports: [
-    ConfigModule,
-    DatabaseModule,
-    AuthModule,
-    UserModule,
-    TeamModule,
-    ReservationModule,
-    SeatModule,
-  ],
+  imports: [ConfigModule, DatabaseModule, AuthModule, UserModule, TeamModule],
   controllers: [AppController],
   providers: [AppService],
 })

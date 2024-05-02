@@ -1,52 +1,28 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Logger,
-  Param,
   Post,
+  UsePipes,
+  ValidationPipe,
 } from "@nestjs/common";
-import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
-
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { CreateReservationDto } from "./dto/reservation.dto";
+import { Reservation } from "./Reservation.entity";
 import { ReservationService } from "./reservation.service";
-
-import {
-  CancelReservationRequest,
-  CreateReservationRequest,
-  CreateReservationResponse,
-  GetReservationListResponse,
-} from "./dto";
+import { User } from "src/user/user.entity";
 
 @ApiTags("reservation")
 @Controller("reservation")
 export class ReservationController {
   private logger = new Logger("Reservations");
 
-  constructor(private readonly reservationService: ReservationService) {}
+  constructor(private reservationService: ReservationService) {}
 
-  @Post()
-  @ApiOkResponse({ type: CreateReservationResponse })
-  async createReservation(
-    @Body() body: CreateReservationRequest
-  ): Promise<CreateReservationResponse> {
-    return this.reservationService.createReservation(body);
-  }
-
-  @Get("/:reservedAt")
-  @ApiOkResponse({ type: GetReservationListResponse })
-  async getReservationList(
-    @Param("reservedAt") reservedAt: string
-  ): Promise<GetReservationListResponse> {
-    return this.reservationService.getReservationList(reservedAt);
-  }
-
-  @Delete()
-  async cancelReservation(
-    @Body() body: CancelReservationRequest
-  ): Promise<void> {
-    await this.reservationService.cancelReservation(body);
-
-    return;
+  @Get()
+  @ApiOperation({ summary: "사무실 자리 예약 현황 조회" })
+  findAll(): string {
+    return "This action returns all reservations";
   }
 }
