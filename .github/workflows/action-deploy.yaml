@@ -1,0 +1,60 @@
+name: deploy
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - chore/deploy-on-ecq
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      # 프로덕션 환경에 원하는 환경변수를 세팅하기위해 어쩔 수 없이 무식한 방법을 동원
+      - name: Create dot env file
+        run: ./tools/setupProdEnv.sh
+        env:
+          SECRET: ${{ secrets.SECRET}}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID}}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET}}
+          GOOGLE_REDIRECT_URL: ${{ secrets.GOOGLE_REDIRECT_URL}}
+          PORT: ${{ secrets.PORT}}
+          DATABASE_HOST: ${{ secrets.DATABASE_HOST}}
+          DATABASE_PORT: ${{ secrets.DATABASE_PORT}}
+          DATABASE_DB: ${{ secrets.DATABASE_DB}}
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME}}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD}}
+      # ssh deploy 사용하기 전 ssh 테스트
+      - name: Get Private IP
+        run: |
+          echo "Fetching private IP address..."
+          private_ip=$(hostname -I | awk '{print $1}')
+          echo "Private IP: $private_ip"
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.EC2_SECRET }}" > /tmp/deploy_key.pem
+          chmod 600 /tmp/deploy_key.pem
+      - name: Test SSH connection
+        run: |
+          ssh -o StrictHostKeyChecking=no -i /tmp/deploy_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} echo "SSH connection established"
+      # 배포
+      - name: Deploy to Server
+        uses: easingthemes/ssh-deploy@v5.0.3
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SECRET }}
+          ARGS: "-rlgoDzvc --delete"
+          REMOTE_HOST: ${{ secrets.EC2_HOST }}
+          REMOTE_USER: ${{ secrets.EC2_USER }}
+          EXCLUDE: "/dist/, /node_modules/"
+          SOURCE: "./"
+          TARGET: "/home/ec2-user/shipcheck/"
+          SCRIPT_BEFORE: |
+            whoami
+            mkdir -p ~/shipcheck
+            ls -al 
+            ls -al /home/ec2-user/shipcheck
+          SCRIPT_AFTER: |
+            whoami
+            ls -al
+            ls -al /home/ec2-user/shipcheck
+            echo $RSYNC_STDOUT
