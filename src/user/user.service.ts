@@ -19,6 +19,14 @@ export class UserService {
     });
   }
 
+  async getUser({ userId }): Promise<User> {
+    const result = await this.dataSource.manager.findOne(User, {
+      where: { id: userId },
+    });
+
+    return result;
+  }
+
   async createUser(
     userPayload: Pick<User, "email" | "name" | "photo">
   ): Promise<User> {

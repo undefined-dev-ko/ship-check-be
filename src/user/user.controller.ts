@@ -7,8 +7,9 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { AuthGuard, Public } from "../common/authGuard";
-import { GetAllUserResponse } from "./dto";
+import { GetAllUserResponse, GetUserResponse } from "./dto";
 import { UserService } from "./user.service";
+import { AuthPayload, JwtPayload } from "../common/authUtil";
 
 @Controller("user")
 @ApiTags("user")
@@ -30,5 +31,11 @@ export class UserController {
   })
   async getAllUser(): Promise<GetAllUserResponse[]> {
     return this.userService.getAllUser();
+  }
+
+  @Get("/user")
+  @ApiOkResponse({ type: GetUserResponse })
+  async getUser(@AuthPayload() user: JwtPayload): Promise<GetUserResponse> {
+    return this.userService.getUser({ userId: user.id });
   }
 }
