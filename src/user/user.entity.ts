@@ -50,10 +50,6 @@ export class User {
   @Column({ nullable: true })
   teamId?: number;
 
-  @ApiProperty({ description: "고정석", nullable: true })
-  @OneToOne(() => Seat, (seat) => seat.fixedUser)
-  fixedSeat?: Relation<Seat>;
-
   @ApiProperty()
   @CreateDateColumn()
   createdAt: Date;

@@ -32,9 +32,13 @@ export class Reservation {
   @JoinColumn({ name: "seatId", referencedColumnName: "id" })
   seat: Relation<Seat>;
 
-  @ApiProperty({ description: " 자리 ID" })
+  @ApiProperty({ description: "자리 ID" })
   @Column()
   seatId: number;
+
+  @ApiProperty({ description: "고정석 여부" })
+  @Column()
+  isFixedSeat: boolean;
 
   @Column({ type: "date" })
   @ApiProperty({ description: "예약 날짜 YYYY-MM-DD 형식" })

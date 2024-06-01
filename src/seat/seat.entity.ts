@@ -24,13 +24,4 @@ export class Seat {
   @ApiProperty({ description: "예약 리스트", type: Reservation, isArray: true })
   @OneToMany(() => Reservation, (reservation) => reservation.seat)
   reservations: Relation<Reservation[]>;
-
-  @ApiProperty({ description: "고정 유저", type: User })
-  @OneToOne(() => User, (user) => user.fixedSeat)
-  @JoinColumn({ name: "fixedUserId", referencedColumnName: "id" })
-  fixedUser?: Relation<User>;
-
-  @Column({ nullable: true })
-  @ApiProperty({ description: "고정 유저 ID" })
-  fixedUserId?: number;
 }
