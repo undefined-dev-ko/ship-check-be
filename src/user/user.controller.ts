@@ -33,7 +33,7 @@ export class UserController {
     return this.userService.getAllUser();
   }
 
-  @Get("/user")
+  @Get("/detail")
   @ApiOkResponse({ type: GetUserResponse })
   async getUser(@AuthPayload() user: JwtPayload): Promise<GetUserResponse> {
     return this.userService.getUser({ userId: user.id });
