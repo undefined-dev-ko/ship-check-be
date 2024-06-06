@@ -38,7 +38,7 @@ export class Reservation {
 
   @ApiProperty({ description: "고정석 여부" })
   @Column()
-  isFixedSeat: boolean;
+  isFixedSeat?: boolean;
 
   @Column({ type: "date" })
   @ApiProperty({ description: "예약 날짜 YYYY-MM-DD 형식" })

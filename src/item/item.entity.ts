@@ -10,7 +10,11 @@ import {
 } from "typeorm";
 import { Seat } from "../seat/seat.entity";
 
-export type ItemCategory = "monitor" | "arm" | "charger";
+export enum ItemCategory {
+  Monitor = "monitor",
+  Arm = "arm",
+  Charger = "charger",
+}
 
 @Entity("item")
 export class Item {
@@ -19,7 +23,7 @@ export class Item {
   id: number;
 
   @Column()
-  @ApiProperty({ description: "장비 종류" })
+  @ApiProperty({ description: "장비 종류", type: "enum", enum: ItemCategory })
   category: ItemCategory;
 
   @Column()
@@ -27,7 +31,7 @@ export class Item {
   memo?: string;
 
   @ApiProperty({ description: "장비가 놓인 자리" })
-  @ManyToOne(() => Seat, (seat) => seat.reservations)
+  @ManyToOne(() => Seat, (seat) => seat.items)
   @JoinColumn({ name: "seatId", referencedColumnName: "id" })
   seat?: Relation<Seat>;
 
