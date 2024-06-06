@@ -14,7 +14,6 @@ export interface JwtPayload extends Partial<UserEntity> {
 }
 
 export class AuthUtil {
-  private static secret: string = process.env.SECRET || randomUUID();
   constructor() {}
 
   public createToken(jwtPayload: JwtPayload): {
@@ -29,7 +28,7 @@ export class AuthUtil {
       Object.assign(jwtPayload, {
         refSig: createHash("SHA-256").update(refreshToken).digest("base64"),
       }),
-      AuthUtil.secret,
+      process.env.SECRET,
       { expiresIn: "7d" }
     );
 
@@ -45,22 +44,26 @@ export class AuthUtil {
     accessToken: string;
     refreshToken: string;
   }) {
-    const jwtPayload = this.validateAccessToken(tokenPair.accessToken);
+    const jwtPayload = jwt.decode(tokenPair.accessToken) as JwtPayload;
 
     if (
       jwtPayload.refSig ===
       createHash("SHA-256").update(tokenPair.refreshToken).digest("base64")
     ) {
       return this.createToken({
-        ...jwtPayload,
+        id: jwtPayload.id,
+        name: jwtPayload.name,
+        email: jwtPayload.email,
+        team: jwtPayload.team,
+        photo: jwtPayload.photo,
       });
     }
 
-    throw new Error("nonono");
+    return { accessToken: null, refreshToken: null };
   }
 
   public validateAccessToken(accessToken: string): JwtPayload {
-    const verified = jwt.verify(accessToken, AuthUtil.secret) as JwtPayload;
+    const verified = jwt.verify(accessToken, process.env.SECRET) as JwtPayload;
     return verified;
   }
 }

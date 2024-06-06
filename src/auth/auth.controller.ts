@@ -1,7 +1,14 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  InternalServerErrorException,
+  Post,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AuthService } from "./auth.service";
 import { CreateAccessTokenByGoogleRequest, TokenPair } from "./dto";
+import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 
 @ApiTags("auth")
 @Controller("auth")

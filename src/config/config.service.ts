@@ -21,6 +21,7 @@ export class ConfigService {
   private environments: Record<string, any>;
   constructor() {
     this.environments = dotenv.parse(readFileSync(".env"));
+    dotenv.config({ path: ".env" });
   }
 
   private get(envName: EnvName, required = false) {
