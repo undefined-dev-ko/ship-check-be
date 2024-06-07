@@ -9,6 +9,7 @@ import {
 } from "./dto";
 import { DataSource } from "typeorm";
 import { Seat } from "../seat/seat.entity";
+import { ConflictException } from "@nestjs/common";
 
 @Injectable()
 export class ReservationService {
@@ -33,8 +34,17 @@ export class ReservationService {
     const seat = await this.dataSource.manager.findOne(Seat, {
       where: { id: payload.seatId },
     });
+
     if (!seat) {
       throw new NotFoundException("좌석이 존재하지않습니다.");
+    }
+
+    const alreadyOccupied = await this.dataSource.manager.findOne(Reservation, {
+      where: { seatId: payload.seatId, reservedAt: payload.reservedAt },
+    });
+
+    if (alreadyOccupied) {
+      throw new ConflictException({ message: "이미 예약된 좌석입니다." });
     }
 
     const reservation = this.dataSource.manager.create<

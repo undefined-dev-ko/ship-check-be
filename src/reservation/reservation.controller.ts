@@ -8,7 +8,12 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiConflictResponse,
+  ApiOkResponse,
+  ApiTags,
+} from "@nestjs/swagger";
 
 import { ReservationService } from "./reservation.service";
 
@@ -32,6 +37,7 @@ export class ReservationController {
 
   @Post()
   @ApiOkResponse({ type: CreateReservationResponse })
+  @ApiConflictResponse({ description: "이미 예약된 좌석입니다." })
   async createReservation(
     @AuthPayload() user: JwtPayload,
     @Body() body: CreateReservationRequest
