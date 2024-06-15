@@ -2,7 +2,7 @@ name: ship-check-be-action
 on:
   push:
     branches:
-      - release
+      - mainTest
 
 jobs:
   test:

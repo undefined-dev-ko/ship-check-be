@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - chore/deploy-on-ecq
+      - release
 jobs:
   deploy:
     runs-on: self-hosted
