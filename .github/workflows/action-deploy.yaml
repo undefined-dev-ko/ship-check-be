@@ -49,4 +49,5 @@ jobs:
             whoami
             echo $RSYNC_STDOUT
             cd /custom/newhome/shipcheck
+            sudo docker-compose -f docker-compose-db.yml up --no-recreate -d
             sudo docker-compose up -d --build
