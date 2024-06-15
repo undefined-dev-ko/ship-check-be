@@ -10,9 +10,9 @@ FROM node:20-alpine
 WORKDIR /app
 COPY --from=0 ./dist ./dist
 COPY ./package*.json ./
-# COPY ./.env* ./
+COPY ./.env* ./
 RUN npm install --production
 
 
-EXPOSE 3010
+EXPOSE 8080
 CMD [ "npm", "run", "start:prod" ]
