@@ -9,6 +9,7 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
   ApiOkResponse,
@@ -48,6 +49,7 @@ export class ReservationController {
     description: "이미 예약된 좌석입니다.",
     type: SeatAlreadyBookedException,
   })
+  @ApiBadRequestResponse({ description: "이미 지난날의 예약은 할 수 없습니다" })
   async createReservation(
     @AuthPayload() user: JwtPayload,
     @Body() body: CreateReservationRequest
@@ -64,6 +66,9 @@ export class ReservationController {
   }
 
   @Delete()
+  @ApiBadRequestResponse({
+    description: "이미 지난날의 예약은 취소할 수 없습니다 ;)",
+  })
   async cancelReservation(
     @AuthPayload() user: JwtPayload,
     @Body() body: CancelReservationRequest

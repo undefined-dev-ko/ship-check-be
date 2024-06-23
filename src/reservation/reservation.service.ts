@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { Reservation } from "./reservation.entity";
 import {
@@ -13,6 +17,11 @@ import {
   AlreadyBookedException,
   SeatAlreadyBookedException,
 } from "./exceptions";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 @Injectable()
 export class ReservationService {
@@ -49,9 +58,15 @@ export class ReservationService {
         where: { seatId: payload.seatId, reservedAt: payload.reservedAt },
       }
     );
-
     if (isSeatAlreadyBooked) {
       throw new SeatAlreadyBookedException();
+    }
+
+    const todayDate = dayjs().tz("Asia/Seoul").format("YYYY-MM-DD");
+    if (payload.reservedAt < todayDate) {
+      throw new BadRequestException({
+        message: "이미 지난날의 예약은 할 수 없습니다",
+      });
     }
 
     // 선택한 날짜에 이미 예약한 유저인지 확인
@@ -83,6 +98,13 @@ export class ReservationService {
     const reservation = this.dataSource.manager.findOne(Reservation, {
       where: { seatId: payload.seatId, reservedAt: payload.reservedAt },
     });
+
+    const todayDate = dayjs().tz("Asia/Seoul").format("YYYY-MM-DD");
+    if (payload.reservedAt < todayDate) {
+      throw new BadRequestException({
+        message: "이미 지난날의 예약은 취소할 수 없습니다 ;)",
+      });
+    }
 
     if (!reservation) {
       throw new NotFoundException("해당 예약이 존재하지 않습니다.");
