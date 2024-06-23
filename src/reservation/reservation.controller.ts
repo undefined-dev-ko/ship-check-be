@@ -16,7 +16,10 @@ import {
 } from "@nestjs/swagger";
 
 import { ReservationService } from "./reservation.service";
-
+import {
+  AlreadyBookedException,
+  SeatAlreadyBookedException,
+} from "./exceptions";
 import {
   CancelReservationRequest,
   CreateReservationRequest,
@@ -37,7 +40,14 @@ export class ReservationController {
 
   @Post()
   @ApiOkResponse({ type: CreateReservationResponse })
-  @ApiConflictResponse({ description: "이미 예약된 좌석입니다." })
+  @ApiConflictResponse({
+    description: "이미 같은 날짜에 예약되어 있습니다.",
+    type: AlreadyBookedException,
+  })
+  @ApiConflictResponse({
+    description: "이미 예약된 좌석입니다.",
+    type: SeatAlreadyBookedException,
+  })
   async createReservation(
     @AuthPayload() user: JwtPayload,
     @Body() body: CreateReservationRequest

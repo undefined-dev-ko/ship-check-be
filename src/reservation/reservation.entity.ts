@@ -37,7 +37,7 @@ export class Reservation {
   seatId: number;
 
   @ApiProperty({ description: "고정석 여부" })
-  @Column()
+  @Column({ default: false })
   isFixedSeat?: boolean;
 
   @Column({ type: "date" })

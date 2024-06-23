@@ -9,7 +9,10 @@ import {
 } from "./dto";
 import { DataSource } from "typeorm";
 import { Seat } from "../seat/seat.entity";
-import { ConflictException } from "@nestjs/common";
+import {
+  AlreadyBookedException,
+  SeatAlreadyBookedException,
+} from "./exceptions";
 
 @Injectable()
 export class ReservationService {
@@ -39,12 +42,28 @@ export class ReservationService {
       throw new NotFoundException("좌석이 존재하지않습니다.");
     }
 
-    const alreadyOccupied = await this.dataSource.manager.findOne(Reservation, {
-      where: { seatId: payload.seatId, reservedAt: payload.reservedAt },
-    });
+    // 선택한 날짜와 자리에 이미 예약이 되어있는지 확인
+    const isSeatAlreadyBooked = await this.dataSource.manager.findOne(
+      Reservation,
+      {
+        where: { seatId: payload.seatId, reservedAt: payload.reservedAt },
+      }
+    );
 
-    if (alreadyOccupied) {
-      throw new ConflictException({ message: "이미 예약된 좌석입니다." });
+    if (isSeatAlreadyBooked) {
+      throw new SeatAlreadyBookedException();
+    }
+
+    // 선택한 날짜에 이미 예약한 유저인지 확인
+    const isAlreadyBookedByCurrentUser = await this.dataSource.manager.findOne(
+      Reservation,
+      {
+        where: { userId, reservedAt: payload.reservedAt },
+      }
+    );
+
+    if (isAlreadyBookedByCurrentUser) {
+      throw new AlreadyBookedException();
     }
 
     const reservation = this.dataSource.manager.create<
