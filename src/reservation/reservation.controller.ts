@@ -6,6 +6,7 @@ import {
   Logger,
   Param,
   Post,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -26,6 +27,8 @@ import {
   CreateReservationRequest,
   CreateReservationResponse,
   GetReservationListResponse,
+  RetrieveReservationListRequest,
+  RetrieveReservationListResponse,
 } from "./dto";
 import { AuthGuard } from "../common/authGuard";
 import { AuthPayload, JwtPayload } from "../common/authUtil";
@@ -38,6 +41,14 @@ export class ReservationController {
   private logger = new Logger("Reservations");
 
   constructor(private readonly reservationService: ReservationService) {}
+
+  @Get()
+  @ApiOkResponse({ type: RetrieveReservationListResponse })
+  async retrieveReservationList(
+    @Query() payload: RetrieveReservationListRequest
+  ): Promise<RetrieveReservationListResponse> {
+    return this.reservationService.retrieveReservationList(payload);
+  }
 
   @Post()
   @ApiOkResponse({ type: CreateReservationResponse })

@@ -10,8 +10,10 @@ import {
   CreateReservationRequest,
   CreateReservationResponse,
   GetReservationListResponse,
+  RetrieveReservationListRequest,
+  RetrieveReservationListResponse,
 } from "./dto";
-import { DataSource } from "typeorm";
+import { Between, DataSource, IsNull, Not } from "typeorm";
 import { Seat } from "../seat/seat.entity";
 import {
   AlreadyBookedException,
@@ -29,6 +31,18 @@ export class ReservationService {
     @InjectDataSource()
     private readonly dataSource: DataSource
   ) {}
+
+  async retrieveReservationList(
+    params: RetrieveReservationListRequest
+  ): Promise<RetrieveReservationListResponse> {
+    const reservationList = await this.dataSource.manager.find(Reservation, {
+      where: {
+        reservedAt: Between(params.startReservedAt, params.endReservedAt),
+        userId: Not(IsNull()),
+      },
+    });
+    return { list: reservationList };
+  }
 
   async getReservationList(reservedAt): Promise<GetReservationListResponse> {
     const reservationList = await this.dataSource.manager.find(Reservation, {

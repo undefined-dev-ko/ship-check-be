@@ -47,3 +47,17 @@ export class CancelReservationRequest {
   @ApiProperty({ description: "예약할 날짜 YYYY-MM-DD 형식" })
   reservedAt: string;
 }
+
+export class RetrieveReservationListRequest {
+  @IsString()
+  @ApiProperty({ description: "시작 예약날짜 YYYY-MM-DD 형식" })
+  startReservedAt: string;
+  @IsString()
+  @ApiProperty({ description: "끝 예약날짜 YYYY-MM-DD 형식" })
+  endReservedAt: string;
+}
+
+export class RetrieveReservationListResponse {
+  @ApiProperty({ description: "예약 리스트", isArray: true, type: Reservation })
+  list: Reservation[];
+}
