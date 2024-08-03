@@ -9,6 +9,7 @@ import { TeamModule } from "./team/team.module";
 import { ReservationModule } from "./reservation/reservation.module";
 import { SeatModule } from "./seat/seat.module";
 import { ItemModule } from "./item/item.module";
+import { RankModule } from "./rank/rank.module";
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ItemModule } from "./item/item.module";
     ReservationModule,
     SeatModule,
     ItemModule,
+    RankModule,
   ],
   controllers: [AppController],
   providers: [AppService],

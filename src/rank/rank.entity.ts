@@ -20,5 +20,5 @@ export class Rank {
   user: Relation<User>;
 
   @ApiProperty({ description: "출석, 결석, 취소 횟수" })
-  total: number;
+  count: number;
 }

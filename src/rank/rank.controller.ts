@@ -7,8 +7,8 @@ import { AuthGuard } from "../common/authGuard";
 import { AuthPayload, JwtPayload } from "../common/authUtil";
 
 @ApiTags("rank")
-@ApiBearerAuth()
-@UseGuards(AuthGuard)
+// @ApiBearerAuth()
+// @UseGuards(AuthGuard)
 @Controller("rank")
 export class RankController {
   constructor(private readonly rankService: RankService) {}
