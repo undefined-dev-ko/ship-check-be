@@ -61,3 +61,12 @@ export class RetrieveReservationListResponse {
   @ApiProperty({ description: "예약 리스트", isArray: true, type: Reservation })
   list: Reservation[];
 }
+
+export class GetJudgementsResponse {
+  @ApiProperty({
+    description: "간밤에 예약 취소한 분들",
+    isArray: true,
+    type: String,
+  })
+  userNames: string[];
+}
