@@ -16,6 +16,7 @@ import {
 import { Seat } from "../seat/seat.entity";
 import { Team } from "../team/team.entity";
 import { Reservation } from "../reservation/reservation.entity";
+import { Rank } from "../rank/rank.entity";
 
 @Entity("user")
 @Unique(["email"])
@@ -44,6 +45,11 @@ export class User {
   @ManyToOne(() => Team, (team) => team.users)
   @JoinColumn({ name: "teamId", referencedColumnName: "id" })
   team?: Relation<Team>;
+
+  @ApiProperty({ description: "Rank 정보", type: Rank })
+  @ManyToOne(() => Rank, (rank) => rank.user)
+  @JoinColumn({ name: "rankId", referencedColumnName: "id" })
+  rank?: Relation<Rank>;
 
   // #TODO 팀은 사후에 등록하도록 하기 위해서 nullable로
   @ApiProperty({ description: "소속 팀 ID" })
