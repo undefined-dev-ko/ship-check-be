@@ -1,21 +1,19 @@
-import { Controller, Get, Post, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param } from "@nestjs/common";
 
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from "@nestjs/swagger";
-import { GetRankResponse } from "./dto";
+import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { GetRankRequest, GetRankResponse } from "./dto";
 import { RankService } from "./rank.service";
-import { AuthGuard } from "../common/authGuard";
-import { AuthPayload, JwtPayload } from "../common/authUtil";
 
 @ApiTags("rank")
-// @ApiBearerAuth()
-// @UseGuards(AuthGuard)
 @Controller("rank")
 export class RankController {
   constructor(private readonly rankService: RankService) {}
 
-  @Get()
+  @Get("/:reservedMonth")
   @ApiOkResponse({ type: GetRankResponse })
-  async getRank(@AuthPayload() user: JwtPayload): Promise<GetRankResponse> {
-    return this.rankService.getRankList();
+  async getRank(
+    @Param("reservedMonth") reservedMonth: string
+  ): Promise<GetRankResponse> {
+    return this.rankService.getRankList({ reservedMonth });
   }
 }
