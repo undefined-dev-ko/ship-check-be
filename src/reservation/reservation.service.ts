@@ -9,11 +9,12 @@ import {
   CancelReservationRequest,
   CreateReservationRequest,
   CreateReservationResponse,
+  GetJudgementsResponse,
   GetReservationListResponse,
   RetrieveReservationListRequest,
   RetrieveReservationListResponse,
 } from "./dto";
-import { Between, DataSource, IsNull, Not } from "typeorm";
+import { Between, DataSource, IsNull, MoreThanOrEqual, Not } from "typeorm";
 import { Seat } from "../seat/seat.entity";
 import {
   AlreadyBookedException,
@@ -128,5 +129,43 @@ export class ReservationService {
       seatId: payload.seatId,
       reservedAt: payload.reservedAt,
     });
+  }
+
+  async getJudgements(): Promise<GetJudgementsResponse> {
+    const now = dayjs().tz("Asia/Seoul");
+    const startOfToday = now.startOf("date").toDate();
+    const reservedAt = now.format("YYYY-MM-DD");
+
+    const reservationList = await this.dataSource.manager.find(Reservation, {
+      relations: ["user"],
+      where: {
+        reservedAt,
+      },
+      withDeleted: true,
+    });
+
+    // 현재 예약을 유지중인 유저 id를 set으로 저장
+    const activeReservationUserIdSet = new Set(
+      reservationList
+        .filter((reservation) => !reservation.deletedAt)
+        .map((reservation) => reservation.userId)
+    );
+
+    // 당일 새벽부터 취소하여 현재 예약을 유지하지않고있는 예약 리스트
+    const judgementList = reservationList
+      .filter(
+        (reservation) => !activeReservationUserIdSet.has(reservation.userId)
+      )
+      .filter(
+        (reservation) =>
+          (reservation.deletedAt?.getTime() || 0) >= startOfToday.getTime()
+      );
+
+    const result: GetJudgementsResponse = {
+      userNames: [
+        ...new Set(judgementList.map((reservation) => reservation.user.name)),
+      ],
+    };
+    return result;
   }
 }

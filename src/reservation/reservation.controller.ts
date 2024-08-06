@@ -26,11 +26,12 @@ import {
   CancelReservationRequest,
   CreateReservationRequest,
   CreateReservationResponse,
+  GetJudgementsResponse,
   GetReservationListResponse,
   RetrieveReservationListRequest,
   RetrieveReservationListResponse,
 } from "./dto";
-import { AuthGuard } from "../common/authGuard";
+import { AuthGuard, Public } from "../common/authGuard";
 import { AuthPayload, JwtPayload } from "../common/authUtil";
 
 @ApiTags("reservation")
@@ -66,6 +67,12 @@ export class ReservationController {
     @Body() body: CreateReservationRequest
   ): Promise<CreateReservationResponse> {
     return this.reservationService.createReservation(body, user.id);
+  }
+
+  @Get("judgements")
+  @ApiOkResponse({ type: GetJudgementsResponse })
+  async getJudgements(): Promise<GetJudgementsResponse> {
+    return this.reservationService.getJudgements();
   }
 
   @Get("/:reservedAt")
