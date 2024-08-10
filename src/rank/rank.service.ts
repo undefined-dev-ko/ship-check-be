@@ -14,58 +14,63 @@ export class RankService {
   }: GetRankRequest): Promise<GetRankResponse> {
     if (!reservedMonth) return;
 
-    const reservationList = await this.dataSource.manager.find(Reservation, {
-      where: { reservedAt: Like(`${reservedMonth}%`) },
-      relations: ["user"],
-    });
+    const reservationTotalList = await this.dataSource.manager.find(
+      Reservation,
+      {
+        where: { reservedAt: Like(`${reservedMonth}%`) },
+        withDeleted: true,
+      }
+    );
+
+    const reservationList = reservationTotalList.filter(
+      ({ deletedAt }) => !deletedAt
+    );
 
     const reservationCountMap = reservationList.reduce((acc, reservation) => {
-      const userId = reservation.user.id;
+      const { userId } = reservation;
 
       acc.set(userId, (acc.get(userId) || 0) + 1);
 
       return acc;
     }, new Map<number, number>());
 
-    // 예약횟수가 카운팅 된 랭킹 리스트
-    const reservationRankList = Array.from(reservationCountMap).map(
-      ([userId, count], i) => ({
-        id: i,
-        user: reservationList.find(
-          (reservation) => reservation.user.id === userId
-        ).user,
-        count,
-      })
+    const reservationRankList = Array.from(reservationCountMap).sort(
+      (a, b) => b[1] - a[1] // [userId, count] count를 기준으로 내림차순 정렬
     );
-
-    const top3AttendanceList = reservationRankList
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 3);
-
-    const mostCancelUser = reservationList
-      .filter(({ deletedAt }) => deletedAt)
-      .reduce((acc, reservation) => {
-        const userId = reservation.user.id;
-
-        acc.set(userId, (acc.get(userId) || 0) + 1);
-
-        return acc;
-      }, new Map<number, number>());
-
-    const mostCancelRank = Array.from(mostCancelUser)
-      .map(([userId, count], i) => ({
-        id: i,
-        user: reservationList.find(
-          (reservation) => reservation.user.id === userId
-        ).user,
-        count,
-      }))
-      .sort((a, b) => b.count - a.count);
 
     const userList = await this.dataSource.manager.find(User);
 
-    const reservationUserIdList = reservationList.map(
-      (reservation) => reservation.userId
+    const top3AttendanceList = reservationRankList
+      .slice(0, 3) // 상위 3개 선택
+      .map(([userId, count], i) => ({
+        id: i,
+        user: userList.find((user) => user.id === userId),
+        count,
+      }));
+
+    const cancelList = reservationTotalList.filter(
+      ({ deletedAt }) => deletedAt
+    );
+
+    const cancelCountMap = cancelList.reduce((acc, reservation) => {
+      const { userId } = reservation;
+
+      acc.set(userId, (acc.get(userId) || 0) + 1);
+
+      return acc;
+    }, new Map<number, number>());
+
+    const cancelRankList = Array.from(cancelCountMap)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 1)
+      .map(([userId, count], i) => ({
+        id: i,
+        user: userList.find((user) => user.id === userId),
+        count,
+      }));
+
+    const reservationUserIdList = reservationRankList.map(
+      ([userId, _]) => userId
     );
 
     // 한 번도 출석하지 않은 유저 리스트
@@ -74,9 +79,7 @@ export class RankService {
     );
 
     // 예약횟수가 가장 적은 유저를 reservationList 에서 추출
-    const leastReservationRank = reservationRankList.sort(
-      (a, b) => a.count - b.count
-    );
+    const leastReservationRank = reservationRankList.reverse()[0];
 
     const ghostRank = (() => {
       // 한 번도 출석하지 않은 유저가 있다면 랜덤으로 선정
@@ -92,12 +95,21 @@ export class RankService {
       }
 
       // 모두 출석했다면 예약횟수가 가장 적은 유저를 선정
-      return leastReservationRank[0];
+
+      const leastReservationUser = userList.find(
+        ({ id }) => id === leastReservationRank[0]
+      );
+
+      return {
+        id: 5,
+        user: leastReservationUser,
+        count: leastReservationRank[1],
+      };
     })();
 
     return {
       attendance: top3AttendanceList,
-      cancel: mostCancelRank[0],
+      cancel: cancelRankList[0],
       ghost: ghostRank,
     };
   }
