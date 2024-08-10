@@ -4,6 +4,7 @@ import { DataSource, Like } from "typeorm";
 import { GetRankRequest, GetRankResponse } from "./dto";
 import { Reservation } from "../reservation/reservation.entity";
 import { User } from "../user/user.entity";
+import { countByUserId, selectRandomItem } from "./utils";
 
 @Injectable()
 export class RankService {
@@ -26,13 +27,11 @@ export class RankService {
       ({ deletedAt }) => !deletedAt
     );
 
-    const reservationCountMap = reservationList.reduce((acc, reservation) => {
-      const { userId } = reservation;
+    const cancelList = reservationTotalList.filter(
+      ({ deletedAt }) => deletedAt
+    );
 
-      acc.set(userId, (acc.get(userId) || 0) + 1);
-
-      return acc;
-    }, new Map<number, number>());
+    const reservationCountMap = countByUserId(reservationList);
 
     const reservationRankList = Array.from(reservationCountMap).sort(
       (a, b) => b[1] - a[1] // [userId, count] count를 기준으로 내림차순 정렬
@@ -40,32 +39,26 @@ export class RankService {
 
     const userList = await this.dataSource.manager.find(User);
 
+    const findUser = (userId: number) => {
+      return userList.find((user) => user.id === userId);
+    };
+
     const top3AttendanceList = reservationRankList
-      .slice(0, 3) // 상위 3개 선택
+      .slice(0, 3)
       .map(([userId, count], i) => ({
         id: i,
-        user: userList.find((user) => user.id === userId),
+        user: findUser(userId),
         count,
       }));
 
-    const cancelList = reservationTotalList.filter(
-      ({ deletedAt }) => deletedAt
-    );
-
-    const cancelCountMap = cancelList.reduce((acc, reservation) => {
-      const { userId } = reservation;
-
-      acc.set(userId, (acc.get(userId) || 0) + 1);
-
-      return acc;
-    }, new Map<number, number>());
+    const cancelCountMap = countByUserId(cancelList);
 
     const cancelRankList = Array.from(cancelCountMap)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 1)
-      .map(([userId, count], i) => ({
-        id: i,
-        user: userList.find((user) => user.id === userId),
+      .map(([userId, count]) => ({
+        id: 4,
+        user: findUser(userId),
         count,
       }));
 
@@ -78,14 +71,13 @@ export class RankService {
       ({ id }) => !reservationUserIdList.includes(id)
     );
 
-    // 예약횟수가 가장 적은 유저를 reservationList 에서 추출
+    // 예약횟수가 가장 적은 유저
     const leastReservationRank = reservationRankList.reverse()[0];
 
     const ghostRank = (() => {
       // 한 번도 출석하지 않은 유저가 있다면 랜덤으로 선정
       if (ghostUserList.length) {
-        const ghostUser =
-          ghostUserList[Math.floor(Math.random() * ghostUserList.length)];
+        const ghostUser = selectRandomItem(ghostUserList);
 
         return {
           id: 5,
@@ -95,14 +87,9 @@ export class RankService {
       }
 
       // 모두 출석했다면 예약횟수가 가장 적은 유저를 선정
-
-      const leastReservationUser = userList.find(
-        ({ id }) => id === leastReservationRank[0]
-      );
-
       return {
         id: 5,
-        user: leastReservationUser,
+        user: findUser(leastReservationRank[0]),
         count: leastReservationRank[1],
       };
     })();
